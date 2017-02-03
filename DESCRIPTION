@@ -1,0 +1,16 @@
+Package: sibcorr
+Type: Package
+Title: Estimate sibling and cousin correlations
+Version: 0.0.0.9000
+Authors@R: person("Adermon", "Adrian", email = "adrian.adermon@gmail.com",
+  role = c("aut", "cre"))
+Description: Estimate sibling and cousin correlations
+    after optionally regressing out background characteristics. 
+    Also provides block bootstrap inference.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: data.table,
+    RcppEigen
+RoxygenNote: 6.0.0
+Suggests: testthat
