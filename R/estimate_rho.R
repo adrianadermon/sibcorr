@@ -1,11 +1,21 @@
 # Define function to calculate correlations
-sibcorr <- function(data, weight = 4, controls = NULL, cousins = FALSE) {
+sibcorr <- function(data, id1, id2, id3, weight = 4, controls = NULL, cousins = FALSE) {
 
   # Make copy of data table so that changes aren't brought out of function scope
   dt <- copy(data)
 
-  # Convert to data table and set key
-  setDT(dt, key = "id2")
+  # Convert to data table
+  setDT(dt)
+
+  # Rename id variables
+  setnames(dt, id1, "id1")
+  setnames(dt, id2, "id2")
+  if (cousins == TRUE) {
+    setnames(dt, id3, "id3")
+  }
+
+  # Set key
+  setkey(dt, key = "id2")
 
   # Prepare data for analysis
   #--------------------------

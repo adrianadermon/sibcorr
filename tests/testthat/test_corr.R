@@ -18,7 +18,9 @@ setDT(dt, key = "id2")
 # Convert columns to factors
 for (col in c("by", "gender")) dt[ , (col) := as.factor(dt[[col]])]
 
-
+setnames(dt, "id1", "id_barn")
+setnames(dt, "id2", "id_mor")
+setnames(dt, "id3", "id_mormor")
 
 ### Required naming scheme:
 # Outcome variable = y
@@ -38,26 +40,22 @@ for (col in c("by", "gender")) dt[ , (col) := as.factor(dt[[col]])]
 # cousins selects estimation of the sibling or cousin correlation. Set cousins = TRUE for cousin correlation
 
 test_that("sibling correlations are estimated correctly", {
-  expect_equal(sibcorr(dt), 0.47941563781226687)
-  expect_equal(sibcorr(dt, controls = c("by", "gender")), 0.49059087767216614)
+  expect_equal(sibcorr(dt, id1 = "id_barn", id2 = "id_mor"), 0.47941563781226687)
+  expect_equal(sibcorr(dt, id1 = "id_barn", id2 = "id_mor", controls = c("by", "gender")), 0.49059087767216614)
+  expect_equal(sibcorr(dt, id1 = "id_barn", id2 = "id_mor", weight = 1), 0.47876571240015514)
+  expect_equal(sibcorr(dt, id1 = "id_barn", id2 = "id_mor", weight = 2), 0.47966007916912057)
+  expect_equal(sibcorr(dt, id1 = "id_barn", id2 = "id_mor", weight = 3), 0.47991978060871299)
 })
 
 test_that("cousin correlations are estimated correctly", {
-  expect_equal(sibcorr(dt, cousins = TRUE), 0.13978219591128127)
-  expect_equal(sibcorr(dt, controls = c("by", "gender"), cousins = TRUE), 0.14397525365735642)
+  expect_equal(sibcorr(dt, id1 = "id_barn", id2 = "id_mor", id3 = "id_mormor", cousins = TRUE), 0.13978219591128127)
+  expect_equal(sibcorr(dt, id1 = "id_barn", id2 = "id_mor", id3 = "id_mormor", controls = c("by", "gender"), cousins = TRUE), 0.14397525365735642)
+  expect_equal(sibcorr(dt, "id_barn", "id_mor", "id_mormor", weight = 1, cousins = TRUE), 0.13751981943694128)
+  expect_equal(sibcorr(dt, "id_barn", "id_mor", "id_mormor", weight = 2, cousins = TRUE), 0.13847156469002828)
+  expect_equal(sibcorr(dt, "id_barn", "id_mor", "id_mormor", weight = 3, cousins = TRUE), 0.13862117315575975)
 })
 
-test_that("all weighting schemes work for sibling correlations", {
-  expect_equal(sibcorr(dt, weight = 1), 0.47876571240015514)
-  expect_equal(sibcorr(dt, weight = 2), 0.47966007916912057)
-  expect_equal(sibcorr(dt, weight = 3), 0.47991978060871299)
-})
 
-test_that("all weighting schemes work for cousin correlations", {
-  expect_equal(sibcorr(dt, weight = 1, cousins = TRUE), 0.13751981943694128)
-  expect_equal(sibcorr(dt, weight = 2, cousins = TRUE), 0.13847156469002828)
-  expect_equal(sibcorr(dt, weight = 3, cousins = TRUE), 0.13862117315575975)
-})
 
 # Estimate sibling correlation with boostrap standard errors
 #sibcorr_bs(dt, controls = c("by", "gender"), cousins = FALSE, reps = 10, weight = 2)
