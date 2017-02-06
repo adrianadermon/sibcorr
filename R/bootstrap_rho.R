@@ -8,18 +8,24 @@
 #' @param ci_level Set level for bootstrap confidence interval.
 
 # Define function to bootstrap the correlation
-sibcorr_bs <- function(data, weight = 4, controls = NULL, cousins = FALSE, reps = 50, ci_level = 95) {
+sibcorr_bs <- function(data, id1, id2, id3, ..., cousins = FALSE, reps = 50, ci_level = 95) {
+
+  # Make copy of data table so that changes aren't brought out of function scope
+  dt <- copy(data)
+
+  # Convert to data table
+  setDT(dt)
 
   # Get point estimate
-  rho <- sibcorr(data, weight = weight, controls = controls, cousins = cousins)
+  rho <- sibcorr(dt, id1 = id1, id2 = id2, id3 = id3, cousins = cousins, ...)
 
   # Sample rows with replacement
   if (cousins == FALSE) {
-    byvar <- "id2"
+    byvar <- id2
   } else {
-    byvar <- "id3"
+    byvar <- id3
   }
-  groups <- unique(data, by = byvar)[, get(byvar)]
+  groups <- unique(dt, by = byvar)[, get(byvar)]
 
   bs <- list()
 
@@ -34,9 +40,9 @@ sibcorr_bs <- function(data, weight = 4, controls = NULL, cousins = FALSE, reps 
     # Sample clusters with replacement
     clusters <- sample(groups, length(groups), replace = TRUE)
     # Get resampled dataset
-    resample <- data[get(byvar) %in% clusters]
+    resample <- dt[get(byvar) %in% clusters]
     # Calculate correlation
-    result <- sibcorr(resample, weight = weight, controls = controls, cousins = cousins)
+    result <- sibcorr(resample, id1 = id1, id2 = id2, id3 = id3, cousins = cousins, ...)
     # Store result
     bs <- append(bs, result)
   }
