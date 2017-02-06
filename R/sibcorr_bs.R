@@ -1,11 +1,10 @@
 #' Estimate sibling and cousin correlations
 #'
-#' @param data Estimation data set.
-#' @param weight Select one of four weighting schemes.
-#' @param controls Control variables to regress out before estimating correlation.
-#' @param cousins Estimate cousin correlation if TRUE, otherwise sibling correlation.
+#' @inheritParams sibcorr
+#' @param ... Other options for \code{\link{sibcorr}}
 #' @param reps Number of bootstrap replications.
 #' @param ci_level Set level for bootstrap confidence interval.
+#' @import data.table
 
 # Define function to bootstrap the correlation
 sibcorr_bs <- function(data, id1, id2, id3, ..., cousins = FALSE, reps = 50, ci_level = 95) {

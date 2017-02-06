@@ -1,5 +1,17 @@
+#' Estimate sibling and cousin correlations
+#'
+#' @param data Estimation data set.
+#' @param y Outcome variable
+#' @param id1 Identifier for the children
+#' @param id2 Identifier for the parents
+#' @param id3 Identifier for the grandparents
+#' @param weight Select one of four weighting schemes.
+#' @param controls Control variables to regress out before estimating correlation.
+#' @param cousins Estimate cousin correlation if TRUE, otherwise sibling correlation.
+#' @import data.table
+
 # Define function to calculate correlations
-sibcorr <- function(data, id1, id2, id3, weight = 4, controls = NULL, cousins = FALSE) {
+sibcorr <- function(data, y, id1, id2, id3, weight = 4, controls = NULL, cousins = FALSE) {
 
   # Make copy of data table so that changes aren't brought out of function scope
   dt <- copy(data)
@@ -8,6 +20,7 @@ sibcorr <- function(data, id1, id2, id3, weight = 4, controls = NULL, cousins = 
   setDT(dt)
 
   # Rename id variables
+  setnames(dt, y, "y")
   setnames(dt, id1, "id1")
   setnames(dt, id2, "id2")
   if (cousins == TRUE) {
@@ -21,7 +34,7 @@ sibcorr <- function(data, id1, id2, id3, weight = 4, controls = NULL, cousins = 
   #--------------------------
 
   if (is.null(controls) == FALSE) {
-    # Residualize outcome by regressing on birth year and gender,
+    # Residualize outcome by regressing on control variables,
     # and take residuals as new outcome variable
     formula <- as.formula(paste("y ~", paste(controls, collapse = " + ")))
 
@@ -67,7 +80,8 @@ sibcorr <- function(data, id1, id2, id3, weight = 4, controls = NULL, cousins = 
   variance <- var(
     unique(dt, by = "id1.1")$y.1
   )
-  # Divide by n instead of (n - 1)
+  # The variance function uses n-1 in the denominator, but Solon
+  # uses n - correct for this
   variance <- variance * (n_v - 1) / n_v
 
 
@@ -92,9 +106,7 @@ sibcorr <- function(data, id1, id2, id3, weight = 4, controls = NULL, cousins = 
   # w3 (weak down-weighting) = [1/2[n(n - 1)]^{1/2}]^{-1}
   # w4 (equal cousin pair weight, no down-weighting of large families) = 1
 
-
   # Calculate the selected weights
-
   if (weight == 1) {
     # Calculate w1 weights
     w <- (1/2 * dt$n * (dt$n - 1))
@@ -112,10 +124,6 @@ sibcorr <- function(data, id1, id2, id3, weight = 4, controls = NULL, cousins = 
 
   # Estimate covariances
   #---------------------
-
-  # The Stata covariance function uses n-1 in the denominator, but Solon
-  # uses n. We correct for this below (although it won't make any difference
-  # in large samples).
 
   # Get rid of unneeded variables
   dt <- dt[, .(y.1, y.2)]
