@@ -11,6 +11,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: data.table,
-    RcppEigen
-RoxygenNote: 6.0.0
+    RcppEigen,
+    doParallel
+RoxygenNote: 6.0.1
 Suggests: testthat

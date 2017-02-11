@@ -19,14 +19,6 @@ df$by <- as.factor(df$by)
 # Rename columns
 names(df) <- c("id_mormor", "id_mor", "id_barn", "gender", "by", "w")
 
-set.seed(20170206)
-
-### Required naming scheme:
-# Outcome variable = y
-# Individual identifier = id1
-# Family identifier = id2
-# Extended family (cousin group) identifier = id3
-
 ### Syntax:
 # sibcorr(data, weight = 4, controls = NULL, cousins = FALSE)
 # data should be a data frame or data table
@@ -74,6 +66,8 @@ test_that("cousin correlations are estimated correctly", {
     0.13862117315575975)
 })
 
+set.seed(20170206)
+
 test_that("bootstrap works correctly", {
   expect_equal(
     sibcorr_bs(df, y = "w", id1 = "id_barn", id2 = "id_mor"),
@@ -81,4 +75,17 @@ test_that("bootstrap works correctly", {
   expect_equal(
     sibcorr_bs(df, y = "w", id1 = "id_barn", id2 = "id_mor", id3 = "id_mormor", cousins = TRUE),
     c(0.13978219591128127, "2.5%" = 0.12798557949883563, "97.5%" = 0.14930428951834102))
+})
+
+set.seed(20170211)
+
+test_that("multi-processor bootstrap works correctly", {
+  expect_equal(
+    sibcorr_bs(df, y = "w", id1 = "id_barn", id2 = "id_mor", cores = 4),
+    c(0.47941563781226687, "2.5%" = 0.47, "97.5%" = 0.49),
+    tolerance = 0.01)
+  expect_equal(
+    sibcorr_bs(df, y = "w", id1 = "id_barn", id2 = "id_mor", id3 = "id_mormor", cousins = TRUE, cores = 4),
+    c(0.13978219591128127, "2.5%" = 0.13, "97.5%" = 0.15),
+    tolerance = 0.01)
 })

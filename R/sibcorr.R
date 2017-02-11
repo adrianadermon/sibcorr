@@ -2,9 +2,9 @@
 #'
 #' @param data Estimation data set.
 #' @param y Outcome variable
-#' @param id1 Identifier for the children
-#' @param id2 Identifier for the parents
-#' @param id3 Identifier for the grandparents
+#' @param id1 Individual identifier
+#' @param id2 Family identifier
+#' @param id3 Extended family (cousin group) identifier
 #' @param weight Select one of four weighting schemes.
 #' @param controls Control variables to regress out before estimating correlation.
 #' @param cousins Estimate cousin correlation if TRUE, otherwise sibling correlation.
