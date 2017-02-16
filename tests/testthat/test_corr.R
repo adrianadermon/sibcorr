@@ -56,13 +56,13 @@ test_that("cousin correlations are estimated correctly", {
     sibcorr(df, y = "w", id1 = "id_barn", id2 = "id_mor", id3 = "id_mormor", controls = c("by", "gender"), cousins = TRUE),
     0.14397525365735642)
   expect_equal(
-    sibcorr(df, y = "w", "id_barn", "id_mor", "id_mormor", weight = 1, cousins = TRUE),
+    sibcorr(df, y = "w", id1 = "id_barn", id2 = "id_mor", id3 = "id_mormor", weight = 1, cousins = TRUE),
     0.13751981943694128)
   expect_equal(
-    sibcorr(df, y = "w", "id_barn", "id_mor", "id_mormor", weight = 2, cousins = TRUE),
+    sibcorr(df, y = "w", id1 = "id_barn", id2 = "id_mor", id3 = "id_mormor", weight = 2, cousins = TRUE),
     0.13847156469002828)
   expect_equal(
-    sibcorr(df, y = "w", "id_barn", "id_mor", "id_mormor", weight = 3, cousins = TRUE),
+    sibcorr(df, y = "w", id1 = "id_barn", id2 = "id_mor", id3 = "id_mormor", weight = 3, cousins = TRUE),
     0.13862117315575975)
 })
 

@@ -20,11 +20,11 @@ sibcorr_bs(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50,
 
 \item{cousins}{Estimate cousin correlation if TRUE, otherwise sibling correlation.}
 
-\item{reps}{Number of bootstrap replications.}
+\item{reps}{Number of bootstrap replications}
 
-\item{ci_level}{Set level for bootstrap confidence interval.}
+\item{ci_level}{Set level for bootstrap confidence interval}
 
-\item{cores}{Set number of processor cores.}
+\item{cores}{Set number of processor cores}
 }
 \description{
 Estimate sibling and cousin correlations

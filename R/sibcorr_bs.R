@@ -2,9 +2,9 @@
 #'
 #' @inheritParams sibcorr
 #' @param ... Other options for \code{\link{sibcorr}}
-#' @param reps Number of bootstrap replications.
-#' @param ci_level Set level for bootstrap confidence interval.
-#' @param cores Set number of processor cores.
+#' @param reps Number of bootstrap replications
+#' @param ci_level Set level for bootstrap confidence interval
+#' @param cores Set number of processor cores
 #' @import data.table
 #' @import foreach
 
@@ -30,13 +30,13 @@ sibcorr_bs <- function(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50
 
 
   # Draw a bootstrap sample and estimate the sibling correlation
-  bs_draw <- function(id1 = id1, id2 = id2, id3 = id3, cousins = cousins, ...) {
+  bs_draw <- function(...) {
     # Sample clusters with replacement
     clusters <- sample(groups, length(groups), replace = TRUE)
     # Get resampled dataset
     resample <- dt[get(byvar) %in% clusters]
     # Calculate correlation
-    result <- sibcorr(resample, id1 = id1, id2 = id2, id3 = id3, cousins = cousins, ...)
+    result <- sibcorr(resample, ...)
     return(result)
   }
 
