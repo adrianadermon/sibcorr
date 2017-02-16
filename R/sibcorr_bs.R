@@ -7,7 +7,9 @@
 #' @param reps Number of bootstrap replications
 #' @param ci_level Set level for bootstrap confidence interval
 #' @param cores Set number of processor cores to use for bootstrap estimation
-#' @return The estimated sibling or cousin correlation coefficient and bootstrap confidence interval
+#' @return The estimated sibling or cousin correlation coefficient,
+#' number of individuals, sibling or cousin pairs, and families or extended families,
+#' and bootstrap confidence interval
 #' @details The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
 #' where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
 #' and \code{ext_family} is an extended family (cousin group) identifier.
@@ -49,7 +51,7 @@ sibcorr_bs <- function(formula, data, ..., cousins = FALSE, reps = 50, ci_level 
     # Get resampled dataset
     resample <- dt[get(byvar) %in% clusters]
     # Calculate correlation
-    result <- sibcorr(..., data = resample)
+    result <- sibcorr(..., data = resample)[1]
     return(result)
   }
 
@@ -71,7 +73,6 @@ sibcorr_bs <- function(formula, data, ..., cousins = FALSE, reps = 50, ci_level 
     # Close progress bar
     close(pb)
   } else {
-
     cl <- parallel::makeCluster(cores)
     doParallel::registerDoParallel(cl)
 

@@ -23,7 +23,9 @@ sibcorr_bs(formula, data, ..., cousins = FALSE, reps = 50, ci_level = 95,
 \item{cores}{Set number of processor cores to use for bootstrap estimation}
 }
 \value{
-The estimated sibling or cousin correlation coefficient and bootstrap confidence interval
+The estimated sibling or cousin correlation coefficient,
+number of individuals, sibling or cousin pairs, and families or extended families,
+and bootstrap confidence interval
 }
 \description{
 \code{sibcorr_bs} estimates sibling or cousin correlations with block bootstrap standard errors.

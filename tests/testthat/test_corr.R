@@ -33,41 +33,41 @@ names(df) <- c("id_mormor", "id_mor", "id_barn", "gender", "by", "w")
 test_that("sibling correlations are estimated correctly", {
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor, data = df),
-    0.47941563781226687)
+    c(correlation = 0.47941563781226687, n_individuals = 39282, n_pairs = 39352, n_families = 11645))
   expect_equal(
     sibcorr(w ~ by + gender | id_barn + id_mor, data = df),
-    0.49059087767216614)
+    c(correlation = 0.49059087767216614, n_individuals = 39282, n_pairs = 39352, n_families = 11645))
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor, data = df, weight = 1),
-    0.47876571240015514)
+    c(correlation = 0.47876571240015514, n_individuals = 39282, n_pairs = 39352, n_families = 11645))
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor, data = df, weight = 2),
-    0.47966007916912057)
+    c(correlation = 0.47966007916912057, n_individuals = 39282, n_pairs = 39352, n_families = 11645))
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor, data = df, weight = 3),
-    0.47991978060871299)
+    c(correlation = 0.47991978060871299, n_individuals = 39282, n_pairs = 39352, n_families = 11645))
 })
 
 test_that("cousin correlations are estimated correctly", {
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, cousins = TRUE),
-    0.139953,
+    c(correlation = 0.139953, n_individuals = 39282, n_pairs = 76208, n_families = 5017),
     tolerance = 0.00001)
   expect_equal(
     sibcorr(w ~ by + gender | id_barn + id_mor + id_mormor, data = df, cousins = TRUE),
-    0.1440984,
+    c(correlation = 0.1440984, n_individuals = 39282, n_pairs = 76208, n_families = 5017),
     tolerance = 0.00001)
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, weight = 1, cousins = TRUE),
-    0.1376879,
+    c(correlation = 0.1376879, n_individuals = 39282, n_pairs = 76208, n_families = 5017),
     tolerance = 0.00001)
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, weight = 2, cousins = TRUE),
-    0.1386408,
+    c(correlation = 0.1386408, n_individuals = 39282, n_pairs = 76208, n_families = 5017),
     tolerance = 0.00001)
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, weight = 3, cousins = TRUE),
-    0.1387906,
+    c(correlation = 0.1387906, n_individuals = 39282, n_pairs = 76208, n_families = 5017),
     tolerance = 0.00001)
 })
 
@@ -76,10 +76,10 @@ set.seed(20170206)
 test_that("bootstrap works correctly", {
   expect_equal(
     sibcorr_bs(w ~ 0 | id_barn + id_mor, data = df),
-    c(0.47941563781226687, "2.5%" = 0.46699407161779294, "97.5%" = 0.49040559449898979))
+    c(correlation = 0.47941563781226687, n_individuals = 39282, n_pairs = 39352, n_families = 11645, "2.5%" = 0.46699407161779294, "97.5%" = 0.49040559449898979))
   expect_equal(
     sibcorr_bs(w ~ 0 | id_barn + id_mor + id_mormor, data = df, cousins = TRUE),
-    c(0.1399530, "2.5%" = 0.1278036, "97.5%" = 0.1494802),
+    c(correlation = 0.1399530, n_individuals = 39282, n_pairs = 76208, n_families = 5017, "2.5%" = 0.1278036, "97.5%" = 0.1494802),
     tolerance = 0.0000001)
 })
 
@@ -88,10 +88,10 @@ set.seed(20170211)
 test_that("multi-processor bootstrap works correctly", {
   expect_equal(
     sibcorr_bs(w ~ 0 | id_barn + id_mor, data = df, cores = 4),
-    c(0.47941563781226687, "2.5%" = 0.47, "97.5%" = 0.49),
+    c(correlation = 0.47941563781226687, n_individuals = 39282, n_pairs = 39352, n_families = 11645, "2.5%" = 0.47, "97.5%" = 0.49),
     tolerance = 0.01)
   expect_equal(
     sibcorr_bs(w ~ 0 | id_barn + id_mor + id_mormor, data = df, cousins = TRUE, cores = 4),
-    c(0.13978219591128127, "2.5%" = 0.13, "97.5%" = 0.15),
+    c(correlation = 0.13978219591128127, n_individuals = 39282, n_pairs = 76208, n_families = 5017, "2.5%" = 0.13, "97.5%" = 0.15),
     tolerance = 0.01)
 })

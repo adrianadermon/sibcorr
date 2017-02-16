@@ -12,6 +12,7 @@
 #' The formula can not include functions. This means that all variable transformations,
 #' including setting some variables as factors, must be performed before estimation.
 #' @return The estimated sibling or cousin correlation coefficient
+#' and number of individuals, sibling or cousin pairs, and families or extended families
 #' @import data.table
 
 # Define function to calculate correlations
@@ -66,12 +67,12 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
   #------------------
 
   # Get number of observations used
-  n_v <- nrow(dt)
+  n_ind <- nrow(dt)
   # Calculate variance
   variance <- var(dt$y)
   # The variance function uses n-1 in the denominator, but Solon
   # uses n - correct for this
-  variance <- variance * (n_v - 1) / n_v
+  variance <- variance * (n_ind - 1) / n_ind
 
   # Reshape data into sibling or cousin pairs
   #------------------------------------------
@@ -103,6 +104,9 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
 
   # Drop duplicate observations
   dt <- subset(dt, id1.1 < id1.2)
+
+  # Count number of unique families
+  n_fams <- nrow(unique(dt, by = byvar))
 
   # Now we have a dataset with one copy of each unique sibling/cousin pair
 
@@ -143,5 +147,9 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
   # Calculate correlation
   rho <- covariance / variance
 
-  return(rho)
+  # Get number of sibling pairs
+  n_pairs <- nrow(dt)
+
+  results <- c(correlation = rho, n_individuals = n_ind, n_pairs = n_pairs, n_families = n_fams)
+  return(results)
 }

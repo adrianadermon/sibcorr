@@ -17,6 +17,7 @@ sibcorr(formula, data, weight = 4, cousins = FALSE)
 }
 \value{
 The estimated sibling or cousin correlation coefficient
+and number of individuals, sibling or cousin pairs, and families or extended families
 }
 \description{
 Estimate sibling and cousin correlations.
