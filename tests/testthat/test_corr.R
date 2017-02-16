@@ -51,19 +51,24 @@ test_that("sibling correlations are estimated correctly", {
 test_that("cousin correlations are estimated correctly", {
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, cousins = TRUE),
-    0.13978219591128127)
+    0.139953,
+    tolerance = 0.00001)
   expect_equal(
     sibcorr(w ~ by + gender | id_barn + id_mor + id_mormor, data = df, cousins = TRUE),
-    0.14397525365735642)
+    0.1440984,
+    tolerance = 0.00001)
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, weight = 1, cousins = TRUE),
-    0.13751981943694128)
+    0.1376879,
+    tolerance = 0.00001)
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, weight = 2, cousins = TRUE),
-    0.13847156469002828)
+    0.1386408,
+    tolerance = 0.00001)
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, weight = 3, cousins = TRUE),
-    0.13862117315575975)
+    0.1387906,
+    tolerance = 0.00001)
 })
 
 set.seed(20170206)
@@ -74,7 +79,8 @@ test_that("bootstrap works correctly", {
     c(0.47941563781226687, "2.5%" = 0.46699407161779294, "97.5%" = 0.49040559449898979))
   expect_equal(
     sibcorr_bs(w ~ 0 | id_barn + id_mor + id_mormor, data = df, cousins = TRUE),
-    c(0.13978219591128127, "2.5%" = 0.12798557949883563, "97.5%" = 0.14930428951834102))
+    c(0.1399530, "2.5%" = 0.1278036, "97.5%" = 0.1494802),
+    tolerance = 0.0000001)
 })
 
 set.seed(20170211)

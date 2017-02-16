@@ -62,6 +62,17 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
     setnames(dt,"e", "y")
   }
 
+  # Estimate variance
+  #------------------
+
+  # Get number of observations used
+  n_v <- nrow(dt)
+  # Calculate variance
+  variance <- var(dt$y)
+  # The variance function uses n-1 in the denominator, but Solon
+  # uses n - correct for this
+  variance <- variance * (n_v - 1) / n_v
+
   # Reshape data into sibling or cousin pairs
   #------------------------------------------
 
@@ -80,22 +91,8 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
   }
   dt <- merge(dt, dt, by = byvar, suffix = c(".1", ".2"), allow.cartesian = TRUE)
 
-  # id1 now contains at least one copy of each individual - we tag one of each
-  setDT(dt, key = "id1.1")
-
   # Drop siblings for cousin correlation
   if (cousins == TRUE) dt <- subset(dt, id2.1 != id2.2)
-
-  # Get number of observations used
-  n_v <- nrow(unique(dt, by = "id1.1"))
-  # Calculate variance
-  variance <- var(
-    unique(dt, by = "id1.1")$y.1
-  )
-  # The variance function uses n-1 in the denominator, but Solon
-  # uses n - correct for this
-  variance <- variance * (n_v - 1) / n_v
-
 
   # Calculate family size
   dt[ , n := .N, by = byvar]
