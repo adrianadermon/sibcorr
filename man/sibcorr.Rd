@@ -2,7 +2,7 @@
 % Please edit documentation in R/sibcorr.R
 \name{sibcorr}
 \alias{sibcorr}
-\title{Estimate sibling and cousin correlations}
+\title{Estimate sibling and cousin correlations.}
 \usage{
 sibcorr(formula, data, weight = 4, cousins = FALSE)
 }
@@ -15,6 +15,18 @@ sibcorr(formula, data, weight = 4, cousins = FALSE)
 
 \item{cousins}{Estimate cousin correlation if TRUE, otherwise sibling correlation.}
 }
+\value{
+The estimated sibling or cousin correlation coefficient
+}
 \description{
-Estimate sibling and cousin correlations
+Estimate sibling and cousin correlations.
+}
+\details{
+The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
+where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
+and \code{ext_family} is an extended family (cousin group) identifier.
+The extended family identifier is only required if \code{cousins = TRUE}.
+
+The formula can not include functions. This means that all variable transformations,
+including setting some variables as factors, must be performed before estimation.
 }

@@ -1,9 +1,17 @@
-#' Estimate sibling and cousin correlations
+#' Estimate sibling and cousin correlations.
 #'
 #' @param formula Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family
 #' @param data Estimation data set.
 #' @param weight Select one of four weighting schemes.
 #' @param cousins Estimate cousin correlation if TRUE, otherwise sibling correlation.
+#' @details The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
+#' where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
+#' and \code{ext_family} is an extended family (cousin group) identifier.
+#' The extended family identifier is only required if \code{cousins = TRUE}.
+#'
+#' The formula can not include functions. This means that all variable transformations,
+#' including setting some variables as factors, must be performed before estimation.
+#' @return The estimated sibling or cousin correlation coefficient
 #' @import data.table
 
 # Define function to calculate correlations

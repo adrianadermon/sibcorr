@@ -2,7 +2,7 @@
 % Please edit documentation in R/sibcorr_bs.R
 \name{sibcorr_bs}
 \alias{sibcorr_bs}
-\title{Estimate sibling and cousin correlations}
+\title{Estimate sibling and cousin correlations with boostrap confidence intervals.}
 \usage{
 sibcorr_bs(formula, data, ..., cousins = FALSE, reps = 50, ci_level = 95,
   cores = 1)
@@ -22,6 +22,18 @@ sibcorr_bs(formula, data, ..., cousins = FALSE, reps = 50, ci_level = 95,
 
 \item{cores}{Set number of processor cores to use for bootstrap estimation}
 }
+\value{
+The estimated sibling or cousin correlation coefficient and bootstrap confidence interval
+}
 \description{
-Estimate sibling and cousin correlations
+\code{sibcorr_bs} estimates sibling or cousin correlations with block bootstrap standard errors.
+}
+\details{
+The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
+where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
+and \code{ext_family} is an extended family (cousin group) identifier.
+The extended family identifier is only required if \code{cousins = TRUE}.
+
+The formula can not include functions. This means that all variable transformations,
+including setting some variables as factors, must be performed before estimation.
 }
