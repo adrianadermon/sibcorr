@@ -13,8 +13,8 @@ context("Correlation estimation")
 df <- read_feather("../../data_small.feather")
 
 # Convert columns to factors
-df$gender <- as.factor(df$gender)
-df$by <- as.factor(df$by)
+#df$gender <- as.factor(df$gender)
+#df$by <- as.factor(df$by)
 
 # Rename columns
 names(df) <- c("id_mormor", "id_mor", "id_barn", "gender", "by", "w")
@@ -35,7 +35,7 @@ test_that("sibling correlations are estimated correctly", {
     sibcorr(w ~ 0 | id_barn + id_mor, data = df),
     c(correlation = 0.47941563781226687, n_individuals = 39282, n_pairs = 39352, n_families = 11645))
   expect_equal(
-    sibcorr(w ~ by + gender | id_barn + id_mor, data = df),
+    sibcorr(w ~ factor(by) + factor(gender) | id_barn + id_mor, data = df),
     c(correlation = 0.49059087767216614, n_individuals = 39282, n_pairs = 39352, n_families = 11645))
   expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor, data = df, weight = 1),
@@ -54,7 +54,7 @@ test_that("cousin correlations are estimated correctly", {
     c(correlation = 0.139953, n_individuals = 39282, n_pairs = 76208, n_families = 5017),
     tolerance = 0.00001)
   expect_equal(
-    sibcorr(w ~ by + gender | id_barn + id_mor + id_mormor, data = df, cousins = TRUE),
+    sibcorr(w ~ factor(by) + factor(gender) | id_barn + id_mor + id_mormor, data = df, cousins = TRUE),
     c(correlation = 0.1440984, n_individuals = 39282, n_pairs = 76208, n_families = 5017),
     tolerance = 0.00001)
   expect_equal(

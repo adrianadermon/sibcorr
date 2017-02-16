@@ -9,8 +9,8 @@
 #' and \code{ext_family} is an extended family (cousin group) identifier.
 #' The extended family identifier is only required if \code{cousins = TRUE}.
 #'
-#' The formula can not include functions. This means that all variable transformations,
-#' including setting some variables as factors, must be performed before estimation.
+#' The formula does not handle functions on the left hand side.
+#' This means that any transformations of the outcome variable must be performed before estimation.
 #' @return The estimated sibling or cousin correlation coefficient
 #' and number of individuals, sibling or cousin pairs, and families or extended families
 #' @import data.table
@@ -22,9 +22,10 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
   formula <- Formula::Formula(formula)
 
   # Parse formula
-  y <- all.vars(formula(formula, rhs = 0))
-  controls <- all.vars(formula(formula, lhs = 0, rhs = 1))
-  identifiers <- all.vars(formula(formula, lhs = 0, rhs = 2))
+  y <- all.vars(terms(formula, rhs = 0))
+  controls <- all.vars(terms(formula, lhs = 0, rhs = 1))
+  controls_transformed <- labels(terms(formula, lhs = 0, rhs = 1))
+  identifiers <- all.vars(terms(formula, lhs = 0, rhs = 2))
 
   # Make copy of data table so that changes aren't brought out of function scope
   dt <- copy(data)
@@ -49,7 +50,7 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
   if (length(controls) != 0) {
     # Residualize outcome by regressing on control variables,
     # and take residuals as new outcome variable
-    formula <- as.formula(paste("y ~", paste(controls, collapse = " + ")))
+    formula <- as.formula(paste("y ~", paste(controls_transformed, collapse = " + ")))
 
     X <- model.matrix(formula, data = dt)
     y <- dt$y
@@ -60,7 +61,7 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
 
     # Drop control variables
     dt[, append("y", controls) := NULL]
-    setnames(dt,"e", "y")
+    setnames(dt, "e", "y")
   }
 
   # Estimate variance

@@ -36,6 +36,6 @@ where \code{individual} is an individual identifier, \code{family} is a family (
 and \code{ext_family} is an extended family (cousin group) identifier.
 The extended family identifier is only required if \code{cousins = TRUE}.
 
-The formula can not include functions. This means that all variable transformations,
-including setting some variables as factors, must be performed before estimation.
+The formula does not handle functions on the left hand side.
+This means that any transformations of the outcome variable must be performed before estimation.
 }
