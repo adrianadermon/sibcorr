@@ -1,17 +1,21 @@
 #' Estimate sibling and cousin correlations
 #'
+#' @param formula Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family
 #' @param data Estimation data set.
-#' @param y Outcome variable
-#' @param id1 Individual identifier
-#' @param id2 Family identifier
-#' @param id3 Extended family (cousin group) identifier
 #' @param weight Select one of four weighting schemes.
-#' @param controls Control variables to regress out before estimating correlation.
 #' @param cousins Estimate cousin correlation if TRUE, otherwise sibling correlation.
 #' @import data.table
 
 # Define function to calculate correlations
-sibcorr <- function(data, y, id1, id2, id3, weight = 4, controls = NULL, cousins = FALSE) {
+sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
+
+  # Put formula in Formula format
+  formula <- Formula::Formula(formula)
+
+  # Parse formula
+  y <- all.vars(formula(formula, rhs = 0))
+  controls <- all.vars(formula(formula, lhs = 0, rhs = 1))
+  identifiers <- all.vars(formula(formula, lhs = 0, rhs = 2))
 
   # Make copy of data table so that changes aren't brought out of function scope
   dt <- copy(data)
@@ -21,10 +25,10 @@ sibcorr <- function(data, y, id1, id2, id3, weight = 4, controls = NULL, cousins
 
   # Rename id variables
   setnames(dt, y, "y")
-  setnames(dt, id1, "id1")
-  setnames(dt, id2, "id2")
+  setnames(dt, identifiers[1], "id1")
+  setnames(dt, identifiers[2], "id2")
   if (cousins == TRUE) {
-    setnames(dt, id3, "id3")
+    setnames(dt, identifiers[3], "id3")
   }
 
   # Set key
@@ -33,7 +37,7 @@ sibcorr <- function(data, y, id1, id2, id3, weight = 4, controls = NULL, cousins
   # Prepare data for analysis
   #--------------------------
 
-  if (is.null(controls) == FALSE) {
+  if (length(controls) != 0) {
     # Residualize outcome by regressing on control variables,
     # and take residuals as new outcome variable
     formula <- as.formula(paste("y ~", paste(controls, collapse = " + ")))

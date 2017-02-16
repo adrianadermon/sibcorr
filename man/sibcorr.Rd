@@ -4,23 +4,14 @@
 \alias{sibcorr}
 \title{Estimate sibling and cousin correlations}
 \usage{
-sibcorr(data, y, id1, id2, id3, weight = 4, controls = NULL,
-  cousins = FALSE)
+sibcorr(formula, data, weight = 4, cousins = FALSE)
 }
 \arguments{
+\item{formula}{Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family}
+
 \item{data}{Estimation data set.}
 
-\item{y}{Outcome variable}
-
-\item{id1}{Individual identifier}
-
-\item{id2}{Family identifier}
-
-\item{id3}{Extended family (cousin group) identifier}
-
 \item{weight}{Select one of four weighting schemes.}
-
-\item{controls}{Control variables to regress out before estimating correlation.}
 
 \item{cousins}{Estimate cousin correlation if TRUE, otherwise sibling correlation.}
 }

@@ -4,17 +4,13 @@
 \alias{sibcorr_bs}
 \title{Estimate sibling and cousin correlations}
 \usage{
-sibcorr_bs(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50,
-  ci_level = 95, cores = 1)
+sibcorr_bs(formula, data, ..., cousins = FALSE, reps = 50, ci_level = 95,
+  cores = 1)
 }
 \arguments{
+\item{formula}{Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family}
+
 \item{data}{Estimation data set.}
-
-\item{id1}{Individual identifier}
-
-\item{id2}{Family identifier}
-
-\item{id3}{Extended family (cousin group) identifier}
 
 \item{...}{Other options for \code{\link{sibcorr}}}
 
@@ -24,7 +20,7 @@ sibcorr_bs(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50,
 
 \item{ci_level}{Set level for bootstrap confidence interval}
 
-\item{cores}{Set number of processor cores}
+\item{cores}{Set number of processor cores to use for bootstrap estimation}
 }
 \description{
 Estimate sibling and cousin correlations

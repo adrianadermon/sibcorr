@@ -4,12 +4,15 @@
 #' @param ... Other options for \code{\link{sibcorr}}
 #' @param reps Number of bootstrap replications
 #' @param ci_level Set level for bootstrap confidence interval
-#' @param cores Set number of processor cores
+#' @param cores Set number of processor cores to use for bootstrap estimation
 #' @import data.table
 #' @import foreach
 
 # Define function to bootstrap the correlation
-sibcorr_bs <- function(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50, ci_level = 95, cores = 1) {
+sibcorr_bs <- function(formula, data, ..., cousins = FALSE, reps = 50, ci_level = 95, cores = 1) {
+
+  # Parse formula
+  identifiers <- all.vars(formula(Formula::Formula(formula), lhs = 0, rhs = 2))
 
   # Make copy of data table so that changes aren't brought out of function scope
   dt <- copy(data)
@@ -18,13 +21,13 @@ sibcorr_bs <- function(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50
   setDT(dt)
 
   # Get point estimate
-  rho <- sibcorr(dt, id1 = id1, id2 = id2, id3 = id3, cousins = cousins, ...)
+  rho <- sibcorr(formula, data = dt, cousins = cousins, ...)
 
   # Sample rows with replacement
   if (cousins == FALSE) {
-    byvar <- id2
+    byvar <- identifiers[2]
   } else {
-    byvar <- id3
+    byvar <- identifiers[3]
   }
   groups <- unique(dt, by = byvar)[, get(byvar)]
 
@@ -36,7 +39,7 @@ sibcorr_bs <- function(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50
     # Get resampled dataset
     resample <- dt[get(byvar) %in% clusters]
     # Calculate correlation
-    result <- sibcorr(resample, ...)
+    result <- sibcorr(..., data = resample)
     return(result)
   }
 
@@ -52,7 +55,7 @@ sibcorr_bs <- function(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50
       # Update progress bar
       setTxtProgressBar(pb, i)
       # Perform a bootstrap draw
-      bs_draw(id1 = id1, id2 = id2, id3 = id3, cousins = cousins, ...)
+      bs_draw(formula, cousins = cousins, ...)
     }
 
     # Close progress bar
@@ -70,7 +73,7 @@ sibcorr_bs <- function(data, id1, id2, id3 = "", ..., cousins = FALSE, reps = 50
       .packages = c("data.table")
     ) %dopar% {
       # Perform a bootstrap draw
-      bs_draw(id1 = id1, id2 = id2, id3 = id3, cousins = cousins, ...)
+      bs_draw(formula, cousins = cousins, ...)
     }
 
     parallel::stopCluster(cl)

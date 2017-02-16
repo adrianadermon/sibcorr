@@ -13,6 +13,7 @@ LazyData: true
 Imports: data.table,
     RcppEigen,
     doParallel,
-    foreach
+    foreach,
+    Formula
 RoxygenNote: 6.0.1
 Suggests: testthat
