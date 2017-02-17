@@ -3,11 +3,11 @@
 #' @param formula Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family
 #' @param data Estimation data set.
 #' @param weight Select one of four weighting schemes.
-#' @param cousins Estimate cousin correlation if TRUE, otherwise sibling correlation.
 #' @details The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
 #' where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
 #' and \code{ext_family} is an extended family (cousin group) identifier.
-#' The extended family identifier is only required if \code{cousins = TRUE}.
+#' If \{ext_family} is omitted, the sibling correlation is estimated -
+#' otherwise, the cousin correlation is estimated
 #'
 #' The formula does not handle functions on the left hand side.
 #' This means that any transformations of the outcome variable must be performed before estimation.
@@ -16,7 +16,7 @@
 #' @import data.table
 
 # Define function to calculate correlations
-sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
+sibcorr <- function(formula, data, weight = 4) {
 
   # Put formula in Formula format
   formula <- Formula::Formula(formula)
@@ -26,6 +26,13 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
   controls <- all.vars(terms(formula, lhs = 0, rhs = 1))
   controls_transformed <- labels(terms(formula, lhs = 0, rhs = 1))
   identifiers <- all.vars(terms(formula, lhs = 0, rhs = 2))
+
+  # Use number of id variables to select sibling or cousin correlation
+  len_id <- length(identifiers)
+
+  # Ensure that the correct number of id variables have been given
+  if (len_id != 2 & len_id != 3) stop("formula must include two or three identifier variables")
+
 
   # Make copy of data table so that changes aren't brought out of function scope
   dt <- copy(data)
@@ -37,7 +44,7 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
   setnames(dt, y, "y")
   setnames(dt, identifiers[1], "id1")
   setnames(dt, identifiers[2], "id2")
-  if (cousins == TRUE) {
+  if (len_id == 3) {
     setnames(dt, identifiers[3], "id3")
   }
 
@@ -80,13 +87,13 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
 
   # Get rid of unneeded variables
   keeplist <- c("id2", "id1", "y")
-  if (cousins == TRUE) {
+  if (len_id == 3) {
     keeplist <- append("id3", keeplist)
   }
   dt <- dt[, keeplist, with = FALSE]
 
   # Create all sibling/cousin combinations
-  if (cousins == FALSE) {
+  if (len_id == 2) {
     byvar <- "id2"
   } else {
     byvar <- "id3"
@@ -94,7 +101,7 @@ sibcorr <- function(formula, data, weight = 4, cousins = FALSE) {
   dt <- merge(dt, dt, by = byvar, suffix = c(".1", ".2"), allow.cartesian = TRUE)
 
   # Drop siblings for cousin correlation
-  if (cousins == TRUE) dt <- subset(dt, id2.1 != id2.2)
+  if (len_id == 3) dt <- subset(dt, id2.1 != id2.2)
 
   # Calculate family size
   dt[ , n := .N, by = byvar]

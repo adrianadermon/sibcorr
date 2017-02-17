@@ -4,7 +4,7 @@
 \alias{sibcorr}
 \title{Estimate sibling and cousin correlations.}
 \usage{
-sibcorr(formula, data, weight = 4, cousins = FALSE)
+sibcorr(formula, data, weight = 4)
 }
 \arguments{
 \item{formula}{Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family}
@@ -12,8 +12,6 @@ sibcorr(formula, data, weight = 4, cousins = FALSE)
 \item{data}{Estimation data set.}
 
 \item{weight}{Select one of four weighting schemes.}
-
-\item{cousins}{Estimate cousin correlation if TRUE, otherwise sibling correlation.}
 }
 \value{
 The estimated sibling or cousin correlation coefficient
@@ -21,13 +19,4 @@ and number of individuals, sibling or cousin pairs, and families or extended fam
 }
 \description{
 Estimate sibling and cousin correlations.
-}
-\details{
-The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
-where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
-and \code{ext_family} is an extended family (cousin group) identifier.
-The extended family identifier is only required if \code{cousins = TRUE}.
-
-The formula does not handle functions on the left hand side.
-This means that any transformations of the outcome variable must be performed before estimation.
 }

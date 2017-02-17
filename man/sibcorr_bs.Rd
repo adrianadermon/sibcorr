@@ -4,8 +4,7 @@
 \alias{sibcorr_bs}
 \title{Estimate sibling and cousin correlations with boostrap confidence intervals.}
 \usage{
-sibcorr_bs(formula, data, ..., cousins = FALSE, reps = 50, ci_level = 95,
-  cores = 1)
+sibcorr_bs(formula, data, ..., reps = 50, ci_level = 95, cores = 1)
 }
 \arguments{
 \item{formula}{Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family}
@@ -13,8 +12,6 @@ sibcorr_bs(formula, data, ..., cousins = FALSE, reps = 50, ci_level = 95,
 \item{data}{Estimation data set.}
 
 \item{...}{Other options for \code{\link{sibcorr}}}
-
-\item{cousins}{Estimate cousin correlation if TRUE, otherwise sibling correlation.}
 
 \item{reps}{Number of bootstrap replications}
 
@@ -29,13 +26,4 @@ and bootstrap confidence interval
 }
 \description{
 \code{sibcorr_bs} estimates sibling or cousin correlations with block bootstrap standard errors.
-}
-\details{
-The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
-where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
-and \code{ext_family} is an extended family (cousin group) identifier.
-The extended family identifier is only required if \code{cousins = TRUE}.
-
-The formula does not handle functions on the left hand side.
-This means that any transformations of the outcome variable must be performed before estimation.
 }
