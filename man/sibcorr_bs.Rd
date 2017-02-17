@@ -27,3 +27,13 @@ and bootstrap confidence interval
 \description{
 \code{sibcorr_bs} estimates sibling or cousin correlations with block bootstrap standard errors.
 }
+\details{
+The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
+where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
+and \code{ext_family} is an extended family (cousin group) identifier.
+If \code{ext_family} is omitted, the sibling correlation is estimated -
+otherwise, the cousin correlation is estimated
+
+The formula does not handle functions on the left hand side.
+This means that any transformations of the outcome variable must be performed before estimation.
+}

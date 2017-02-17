@@ -3,20 +3,31 @@
 #' @param formula Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family
 #' @param data Estimation data set.
 #' @param weight Select one of four weighting schemes.
+#' @param restriction Put a restriction on the pairs to be used for estimating the covariance
 #' @details The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
 #' where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
 #' and \code{ext_family} is an extended family (cousin group) identifier.
-#' If \{ext_family} is omitted, the sibling correlation is estimated -
+#' If \code{ext_family} is omitted, the sibling correlation is estimated -
 #' otherwise, the cousin correlation is estimated
 #'
 #' The formula does not handle functions on the left hand side.
 #' This means that any transformations of the outcome variable must be performed before estimation.
+#'
+#' The restriction is specified as a vector with the first element giving the name of the variable to restrict on.
+#' If the second element is 0, only pairs with the same value are used.
+#' If the second element is a positive integer, only pairs with that specific difference are used.
+#' If the second element is "unequal", only pairs with different values for the variable are used.
+#' If two integers are given (as second and third elements), and the first is smaller than the second,
+#' only pairs with a difference within that range (inclusive) are used;
+#' if the second is smaller than the first,
+#' only pairs with a difference outside that range (exclusive) are used.
+#'
 #' @return The estimated sibling or cousin correlation coefficient
 #' and number of individuals, sibling or cousin pairs, and families or extended families
 #' @import data.table
 
 # Define function to calculate correlations
-sibcorr <- function(formula, data, weight = 4) {
+sibcorr <- function(formula, data, weight = 4, restriction = NULL) {
 
   # Put formula in Formula format
   formula <- Formula::Formula(formula)
@@ -66,8 +77,8 @@ sibcorr <- function(formula, data, weight = 4) {
 
     dt[, e := res]
 
-    # Drop control variables
-    dt[, append("y", controls) := NULL]
+    # Replace outcome variable
+    dt[, "y" := NULL]
     setnames(dt, "e", "y")
   }
 
@@ -90,6 +101,9 @@ sibcorr <- function(formula, data, weight = 4) {
   if (len_id == 3) {
     keeplist <- append("id3", keeplist)
   }
+  if (is.null(restriction) == FALSE) {
+    keeplist <- append(restriction[1], keeplist)
+  }
   dt <- dt[, keeplist, with = FALSE]
 
   # Create all sibling/cousin combinations
@@ -102,6 +116,28 @@ sibcorr <- function(formula, data, weight = 4) {
 
   # Drop siblings for cousin correlation
   if (len_id == 3) dt <- subset(dt, id2.1 != id2.2)
+
+  # Apply restriction, if specified
+  if (is.null(restriction) == FALSE) {
+    # Get variable to use for restriction
+    var <- restriction[1]
+
+    if (length(restriction) == 3) { # Check if there are two values
+      diff_l <- restriction[2]
+      diff_r <- restriction[3]
+      if (diff_l < diff_r) { # If first value is smaller than second value, get all pairs within the range (inclusive)
+        dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) >= as.numeric(diff_l) &
+                abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) <= as.numeric(diff_r)]
+      } else if (diff_l > diff_r) { # If first value is larger than second value, get all pairs outside the range (exclusive)
+        dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) > as.numeric(diff_l) |
+                abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) < as.numeric(diff_r)]
+      }
+    } else if (restriction[2] == "unequal") { # If "unequal" was set, get all pairs that differ
+      dt <- dt[get(paste0(var, ".1")) != get(paste0(var, ".2"))]
+    } else { # Otherwise, get all pairs where the difference equals the given value - 0 gives all equal pairs
+      dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) == restriction[2]]
+    }
+  }
 
   # Calculate family size
   dt[ , n := .N, by = byvar]

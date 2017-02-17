@@ -13,7 +13,7 @@
 #' @details The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
 #' where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
 #' and \code{ext_family} is an extended family (cousin group) identifier.
-#' If \{ext_family} is omitted, the sibling correlation is estimated -
+#' If \code{ext_family} is omitted, the sibling correlation is estimated -
 #' otherwise, the cousin correlation is estimated
 #'
 #' The formula does not handle functions on the left hand side.

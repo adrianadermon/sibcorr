@@ -66,6 +66,31 @@ test_that("cousin correlations are estimated correctly", {
     tolerance = 0.00001)
 })
 
+
+test_that("restrictions work correctly", {
+  expect_equal(
+    sibcorr(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", 2)),
+    c(correlation = 0.4719575, n_individuals = 39282, n_pairs = 3511, n_families = 2750),
+    tolerance = 0.00001)
+  expect_equal(
+    sibcorr(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", "unequal")),
+    c(correlation = 0.4769372, n_individuals = 39282, n_pairs = 37466, n_families = 11380),
+    tolerance = 0.00001)
+  expect_equal(
+    sibcorr(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", 3, 6)),
+    c(correlation = 0.4821474, n_individuals = 39282, n_pairs = 12177, n_families = 6330),
+    tolerance = 0.00001)
+  expect_equal(
+    unname(sibcorr(w ~ factor(by) + factor(gender) | id_barn + id_mor, data = df, restriction = c("by", 5, 2))),
+    c(0.490645554813508, 39282, 26500, 9786))
+  expect_equal(
+    unname(sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, restriction = c("by", 0, 9))),
+    c(0.143199878287237, 39282, 55119, 4871))
+  expect_equal(
+    unname(sibcorr(w ~ factor(by) + factor(gender) | id_barn + id_mor + id_mormor, data = df, restriction = c("gender", "unequal"))),
+    c(0.145962732074221, 39282, 38069, 4573))
+})
+
 context("Bootstrap estimation")
 
 set.seed(20170206)
@@ -90,5 +115,17 @@ test_that("multi-processor bootstrap works correctly", {
   expect_equal(
     sibcorr_bs(w ~ 0 | id_barn + id_mor + id_mormor, data = df, cores = 4),
     c(correlation = 0.13978219591128127, n_individuals = 39282, n_pairs = 76208, n_families = 5017, "2.5%" = 0.13, "97.5%" = 0.15),
+    tolerance = 0.01)
+})
+
+set.seed(20170217)
+
+test_that("bootstrap works with restriction", {
+  expect_equal(
+    unname(sibcorr_bs(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", 4))),
+    c(0.499471797184667, 39282, 3029, 2440, 0.465584526329792, 0.52979876204937))
+  expect_equal(
+    unname(sibcorr_bs(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", 4), cores = 4)),
+    c(0.499471797184667, 39282, 3029, 2440, 0.47, 0.54),
     tolerance = 0.01)
 })
