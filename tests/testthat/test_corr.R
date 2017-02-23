@@ -73,6 +73,10 @@ test_that("restrictions work correctly", {
     c(correlation = 0.4719575, n_individuals = 39282, n_pairs = 3511, n_families = 2750),
     tolerance = 0.00001)
   expect_equal(
+    sibcorr(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", 2), variance = "post"),
+    c(correlation = 0.4752181, n_individuals = 6415, n_pairs = 3511, n_families = 2750),
+    tolerance = 0.00001)
+  expect_equal(
     sibcorr(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", "unequal")),
     c(correlation = 0.4769372, n_individuals = 39282, n_pairs = 37466, n_families = 11380),
     tolerance = 0.00001)

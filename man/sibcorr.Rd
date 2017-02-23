@@ -4,7 +4,7 @@
 \alias{sibcorr}
 \title{Estimate sibling and cousin correlations.}
 \usage{
-sibcorr(formula, data, weight = 4, restriction = NULL)
+sibcorr(formula, data, weight = 4, restriction = NULL, variance = "pre")
 }
 \arguments{
 \item{formula}{Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family}
@@ -14,6 +14,8 @@ sibcorr(formula, data, weight = 4, restriction = NULL)
 \item{weight}{Select one of four weighting schemes.}
 
 \item{restriction}{Put a restriction on the pairs to be used for estimating the covariance}
+
+\item{variance}{Estimate variance on all individuals ("pre", the default) or only restricted sample ("post")}
 }
 \value{
 The estimated sibling or cousin correlation coefficient

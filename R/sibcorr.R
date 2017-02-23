@@ -4,6 +4,7 @@
 #' @param data Estimation data set.
 #' @param weight Select one of four weighting schemes.
 #' @param restriction Put a restriction on the pairs to be used for estimating the covariance
+#' @param variance Estimate variance on all individuals ("pre", the default) or only restricted sample ("post")
 #' @details The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
 #' where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
 #' and \code{ext_family} is an extended family (cousin group) identifier.
@@ -27,7 +28,7 @@
 #' @import data.table
 
 # Define function to calculate correlations
-sibcorr <- function(formula, data, weight = 4, restriction = NULL) {
+sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") {
 
   # Put formula in Formula format
   formula <- Formula::Formula(formula)
@@ -85,13 +86,15 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL) {
   # Estimate variance
   #------------------
 
-  # Get number of observations used
-  n_ind <- nrow(dt)
-  # Calculate variance
-  variance <- var(dt$y)
-  # The variance function uses n-1 in the denominator, but Solon
-  # uses n - correct for this
-  variance <- variance * (n_ind - 1) / n_ind
+  if (variance == "pre") {
+    # Get number of observations used
+    n_ind <- nrow(dt)
+    # Calculate variance
+    variance <- var(dt$y)
+    # The variance function uses n-1 in the denominator, but Solon
+    # uses n - correct for this
+    variance <- variance * (n_ind - 1) / n_ind
+  }
 
   # Reshape data into sibling or cousin pairs
   #------------------------------------------
@@ -143,8 +146,26 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL) {
   dt[ , n := .N, by = byvar]
   dt[ , n := sqrt(n)]
 
+
   # Drop self matches
   dt <- subset(dt, id1.1 != id1.2)
+
+  # Estimate variance post-restriction if that option is chosen
+  if (variance == "post") {
+    # id1 now contains at least one copy of each individual - we tag one of each
+    setDT(dt, key = "id1.1")
+
+    # Get number of observations used
+    n_ind <- nrow(unique(dt, by = "id1.1"))
+    # Calculate variance
+    variance <- var(
+      unique(dt, by = "id1.1")$y.1
+    )
+    # The variance function uses n-1 in the denominator, but Solon
+    # uses n - correct for this
+    variance <- variance * (n_ind - 1) / n_ind
+  }
+
 
   # Drop duplicate observations
   dt <- subset(dt, id1.1 < id1.2)
