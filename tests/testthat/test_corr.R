@@ -123,10 +123,10 @@ set.seed(20170206)
 
 test_that("bootstrap works correctly", {
   expect_equal(
-    sibcorr_bs(w ~ 0 | id_barn + id_mor, data = df),
+    sibcorr(w ~ 0 | id_barn + id_mor, data = df, reps = 50),
     c(correlation = 0.47941563781226687, n_individuals = 39282, n_pairs = 39352, n_families = 11645, "2.5%" = 0.46699407161779294, "97.5%" = 0.49040559449898979))
   expect_equal(
-    sibcorr_bs(w ~ 0 | id_barn + id_mor + id_mormor, data = df),
+    sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, reps = 50),
     c(correlation = 0.1399530, n_individuals = 39282, n_pairs = 76208, n_families = 5017, "2.5%" = 0.1278036, "97.5%" = 0.1494802),
     tolerance = 0.0000001)
 })
@@ -135,11 +135,11 @@ set.seed(20170211)
 
 test_that("multi-processor bootstrap works correctly", {
   expect_equal(
-    sibcorr_bs(w ~ 0 | id_barn + id_mor, data = df, cores = 4),
+    sibcorr(w ~ 0 | id_barn + id_mor, data = df, reps = 50, cores = 4),
     c(correlation = 0.47941563781226687, n_individuals = 39282, n_pairs = 39352, n_families = 11645, "2.5%" = 0.47, "97.5%" = 0.49),
     tolerance = 0.01)
   expect_equal(
-    sibcorr_bs(w ~ 0 | id_barn + id_mor + id_mormor, data = df, cores = 4),
+    sibcorr(w ~ 0 | id_barn + id_mor + id_mormor, data = df, reps = 50, cores = 4),
     c(correlation = 0.13978219591128127, n_individuals = 39282, n_pairs = 76208, n_families = 5017, "2.5%" = 0.13, "97.5%" = 0.15),
     tolerance = 0.01)
 })
@@ -148,10 +148,10 @@ set.seed(20170217)
 
 test_that("bootstrap works with restriction", {
   expect_equal(
-    unname(sibcorr_bs(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", 4))),
+    unname(sibcorr(w ~ 0 | id_barn + id_mor, data = df, reps = 50, restriction = c("by", 4))),
     c(0.499471797184667, 39282, 3029, 2440, 0.465584526329792, 0.52979876204937))
   expect_equal(
-    unname(sibcorr_bs(w ~ 0 | id_barn + id_mor, data = df, restriction = c("by", 4), cores = 4)),
+    unname(sibcorr(w ~ 0 | id_barn + id_mor, data = df, reps = 50, restriction = c("by", 4), cores = 4)),
     c(0.499471797184667, 39282, 3029, 2440, 0.47, 0.54),
     tolerance = 0.01)
 })
