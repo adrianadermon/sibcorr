@@ -1,15 +1,18 @@
-#' Estimate sibling and cousin correlations with boostrap confidence intervals.
+#' Estimate sibling and cousin correlations.
 #'
-#' \code{sibcorr_bs} estimates sibling or cousin correlations with block bootstrap standard errors.
+#' \code{sibcorr} estimates sibling or cousin correlations with optional block bootstrap standard errors.
 #'
-#' @inheritParams sibcorr
-#' @param ... Other options for \code{\link{sibcorr}}
-#' @param reps Number of bootstrap replications
+#' @param formula Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family
+#' @param data Estimation data set.
+#' @param weight Select one of four weighting schemes.
+#' @param restriction Put a restriction on the pairs to be used for estimating the covariance
+#' @param variance Estimate variance on all individuals ("pre", the default) or only restricted sample ("post")
+#' @param reps Number of bootstrap replications - if set to zero, confidence intervals are not estimated
 #' @param ci_level Set level for bootstrap confidence interval
 #' @param cores Set number of processor cores to use for bootstrap estimation
 #' @return The estimated sibling or cousin correlation coefficient,
 #' number of individuals, sibling or cousin pairs, and families or extended families,
-#' and bootstrap confidence interval
+#' and optionally a bootstrap confidence interval
 #' @details The formula must be specified as \code{outcome ~ controls | individual + family + ext_family},
 #' where \code{individual} is an individual identifier, \code{family} is a family (sibling group) identifier,
 #' and \code{ext_family} is an extended family (cousin group) identifier.
@@ -18,8 +21,19 @@
 #'
 #' The formula does not handle functions on the left hand side.
 #' This means that any transformations of the outcome variable must be performed before estimation.
+#'
+#' The restriction is specified as a vector with the first element giving the name of the variable to restrict on.
+#' If the second element is 0, only pairs with the same value are used.
+#' If the second element is a positive integer, only pairs with that specific difference are used.
+#' If the second element is "unequal", only pairs with different values for the variable are used.
+#' If two integers are given (as second and third elements), and the first is smaller than the second,
+#' only pairs with a difference within that range (inclusive) are used;
+#' if the second is smaller than the first,
+#' only pairs with a difference outside that range (exclusive) are used.
+#'
 #' @import data.table
 #' @import foreach
+
 
 # Define function to bootstrap the correlation
 sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "pre", reps = 0, ci_level = 95, cores = 1) {
