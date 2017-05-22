@@ -46,11 +46,23 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "p
   if (len_id != 2 & len_id != 3) stop("formula must include two or three identifier variables")
 
 
-  # Make copy of data table so that changes aren't brought out of function scope
-  dt <- copy(data)
+  # Make copy of data so that changes aren't brought out of function scope
+  # Keep only relevant variables
+  keep_vars <- c(y, controls, identifiers)
+  if (is.null(restriction) == FALSE) {
+    keep_vars <- append(restriction[1], keep_vars)
+  }
+  if ("data.table" %in% class(data)) {
+    dt <- copy(data[, keep_vars, with = FALSE])
+  } else {
+    dt <- copy(data[, keep_vars])
+  }
 
   # Convert to data table
   setDT(dt)
+
+  # Drop incomplete rows
+  dt <- na.omit(dt)
 
   # Rename id variables
   setnames(dt, y, "y")

@@ -12,6 +12,14 @@ df <- read_feather("../../data_small.feather")
 # Rename columns
 names(df) <- c("id_mormor", "id_mor", "id_barn", "gender", "by", "w")
 
+# Create data frame with missing values
+df_miss <- df
+df_miss[df_miss$by == 1981, "w"] <- NA
+
+# Create data table input
+DT <- copy(df)
+setDT(DT)
+
 ### Syntax:
 # sibcorr(data, weight = 4, controls = NULL, cousins = FALSE)
 # data should be a data frame or data table
@@ -93,6 +101,20 @@ test_that("restrictions work correctly", {
   expect_equal(
     unname(sibcorr(w ~ factor(by) + factor(gender) | id_barn + id_mor + id_mormor, data = df, restriction = c("gender", "unequal"))),
     c(0.145962732074221, 39282, 38069, 4573))
+})
+
+test_that("missing values are dropped correctly", {
+  expect_equal(
+    sibcorr(w ~ factor(by) + factor(gender) | id_barn + id_mor, data = df_miss),
+    c(correlation = 0.4890625, n_individuals = 37253, n_pairs = 35398, n_families = 11087),
+    tolerance = 0.00001)
+})
+
+test_that("program works with data table input", {
+  expect_equal(
+    sibcorr(w ~ factor(by) + factor(gender) | id_barn + id_mor, data = DT),
+    c(correlation = 0.4905909, n_individuals = 39282, n_pairs = 39352, n_families = 11645),
+    tolerance = 0.00001)
 })
 
 context("Bootstrap estimation")
