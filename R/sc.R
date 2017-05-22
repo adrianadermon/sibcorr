@@ -1,5 +1,3 @@
-#' @import data.table
-
 # Define function to calculate correlations
 sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") {
 
@@ -15,18 +13,8 @@ sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") 
   # Use number of id variables to select sibling or cousin correlation
   len_id <- length(identifiers)
 
-
   # Make copy of data so that changes aren't brought out of function scope
-  # Keep only relevant variables
-  keep_vars <- c(y, controls, identifiers)
-  if (is.null(restriction) == FALSE) {
-    keep_vars <- append(restriction[1], keep_vars)
-  }
-  if ("data.table" %in% class(data)) {
-    dt <- copy(data[, keep_vars, with = FALSE])
-  } else {
-    dt <- copy(data[, keep_vars])
-  }
+  dt <- copy(data)
 
   # Rename id variables
   setnames(dt, y, "y")

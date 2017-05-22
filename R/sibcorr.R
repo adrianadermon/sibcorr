@@ -38,8 +38,13 @@
 # Define function to bootstrap the correlation
 sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "pre", reps = 0, ci_level = 95, cores = 1) {
 
+  # Put formula in Formula format
+  forml <- Formula::Formula(formula)
+
   # Parse formula
-  identifiers <- all.vars(formula(Formula::Formula(formula), lhs = 0, rhs = 2))
+  y <- all.vars(terms(forml, rhs = 0))
+  controls <- all.vars(terms(forml, lhs = 0, rhs = 1))
+  identifiers <- all.vars(terms(forml, lhs = 0, rhs = 2))
 
   # Use number of id variables to select sibling or cousin correlation
   len_id <- length(identifiers)
@@ -47,8 +52,17 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "p
   # Ensure that the correct number of id variables have been given
   if (len_id != 2 & len_id != 3) stop("formula must include two or three identifier variables")
 
-  # Make copy of data table so that changes aren't brought out of function scope
-  dt <- copy(data)
+  # Make copy of data so that changes aren't brought out of function scope
+  # Keep only relevant variables
+  keep_vars <- c(y, controls, identifiers)
+  if (is.null(restriction) == FALSE) {
+    keep_vars <- append(restriction[1], keep_vars)
+  }
+  if ("data.table" %in% class(data)) {
+    dt <- copy(data[, keep_vars, with = FALSE])
+  } else {
+    dt <- copy(data[, keep_vars])
+  }
 
   # Convert to data table
   setDT(dt)
