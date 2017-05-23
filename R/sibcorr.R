@@ -84,13 +84,12 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "p
     }
     groups <- unique(dt, by = byvar)[, get(byvar)]
 
-
     # Draw a bootstrap sample and estimate the sibling correlation
     bs_draw <- function(...) {
       # Sample clusters with replacement
       clusters <- sample(groups, length(groups), replace = TRUE)
-      # Get resampled dataset
-      resample <- dt[get(byvar) %in% clusters]
+      # Get bootstrap sample
+      resample <- dt[J(clusters), allow.cartesian = TRUE, on = byvar]
       # Calculate correlation
       result <- sc(..., data = resample)[1]
       return(result)
