@@ -1,13 +1,7 @@
-# This file simulates a sibling dataset and tests some code for estimating the
-# sibling correlation using the method described in Solon, Page, and Duncan (2000)
-# and applied by Hällsten (2014) on Swedish data.
-# =====================================================================
-
-library(feather)
 library(data.table)
 library(sibcorr)
 
-df <- read_feather("../../data_small.feather")
+df <- read.csv(file = "../test_data.csv")
 
 # Rename columns
 names(df) <- c("id_mormor", "id_mor", "id_barn", "gender", "by", "w")
