@@ -33,10 +33,18 @@
 #'
 #' @import data.table
 #' @import foreach
+#' @import doRNG
 
 
 # Define function to bootstrap the correlation
-sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "pre", reps = 0, ci_level = 95, cores = 1) {
+sibcorr <- function(formula,
+                    data,
+                    weight = 4,
+                    restriction = NULL,
+                    variance = "pre",
+                    reps = 0,
+                    ci_level = 95,
+                    cores = 1) {
 
   # Put formula in Formula format
   forml <- Formula::Formula(formula)
@@ -50,7 +58,9 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "p
   len_id <- length(identifiers)
 
   # Ensure that the correct number of id variables have been given
-  if (len_id != 2 & len_id != 3) stop("formula must include two or three identifier variables")
+  if (len_id != 2 & len_id != 3) {
+    stop("formula must include two or three identifier variables")
+  }
 
   # Make copy of data so that changes aren't brought out of function scope
   # Keep only relevant variables
@@ -71,7 +81,11 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "p
   dt <- na.omit(dt)
 
   # Get point estimate
-  rho <- sc(formula, data = dt, weight = weight, restriction = restriction, variance = variance)
+  rho <- sc(formula,
+            data = dt,
+            weight = weight,
+            restriction = restriction,
+            variance = variance)
 
   if (reps == 0) {
     result <- rho
@@ -107,7 +121,10 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "p
         # Update progress bar
         setTxtProgressBar(pb, i)
         # Perform a bootstrap draw
-        bs_draw(formula, weight = weight, restriction = restriction, variance = variance)
+        bs_draw(formula,
+                weight = weight,
+                restriction = restriction,
+                variance = variance)
       }
 
       # Close progress bar
@@ -116,22 +133,28 @@ sibcorr <- function(formula, data, weight = 4, restriction = NULL, variance = "p
       cl <- parallel::makeCluster(cores)
       doParallel::registerDoParallel(cl)
 
-      print(paste("Performing", reps, "bootstrap replications on", cores, "processor cores", sep = " "))
+      print(paste("Performing",
+                  reps, "bootstrap replications on",
+                  cores, "processor cores",
+                  sep = " "))
       bs <- foreach(
         i = 1:reps,
         .combine = "c",
         .export = c("sc", "data"),
         .packages = c("data.table")
-      ) %dopar% {
+      ) %dorng% {
         # Perform a bootstrap draw
-        bs_draw(formula, weight = weight, restriction = restriction, variance = variance)
+        bs_draw(formula,
+                weight = weight,
+                restriction = restriction,
+                variance = variance)
       }
 
       parallel::stopCluster(cl)
     }
 
     # Calculate confidence interval quantiles
-    ci_limits <- c((1 - ci_level/100)/2, 1 - (1 - ci_level/100)/2)
+    ci_limits <- c( (1 - ci_level / 100) / 2, 1 - (1 - ci_level / 100) / 2)
 
     # Calculate bootstrap confidence interval
     ci <- quantile(bs, ci_limits)

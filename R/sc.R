@@ -1,5 +1,9 @@
 # Define function to calculate correlations
-sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") {
+sc <- function(formula,
+               data,
+               weight = 4,
+               restriction = NULL,
+               variance = "pre") {
 
   # Put formula in Formula format
   formula <- Formula::Formula(formula)
@@ -33,7 +37,9 @@ sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") 
   if (length(controls) != 0) {
     # Residualize outcome by regressing on control variables,
     # and take residuals as new outcome variable
-    formula <- as.formula(paste("y ~", paste(controls_transformed, collapse = " + ")))
+    formula <- as.formula(paste("y ~",
+                                paste(controls_transformed,
+                                      collapse = " + ")))
 
     X <- model.matrix(formula, data = dt)
     y <- dt$y
@@ -79,7 +85,10 @@ sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") 
   } else {
     byvar <- "id3"
   }
-  dt <- merge(dt, dt, by = byvar, suffix = c(".1", ".2"), allow.cartesian = TRUE)
+  dt <- merge(dt, dt,
+              by = byvar,
+              suffix = c(".1", ".2"),
+              allow.cartesian = TRUE)
 
   # Drop siblings for cousin correlation
   if (len_id == 3) dt <- subset(dt, id2.1 != id2.2)
@@ -89,20 +98,33 @@ sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") 
     # Get variable to use for restriction
     var <- restriction[1]
 
-    if (length(restriction) == 3) { # Check if there are two values
+    # Check if there are two values
+    if (length(restriction) == 3) {
       diff_l <- restriction[2]
       diff_r <- restriction[3]
-      if (diff_l < diff_r) { # If first value is smaller than second value, get all pairs within the range (inclusive)
-        dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) >= as.numeric(diff_l) &
-                abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) <= as.numeric(diff_r)]
-      } else if (diff_l > diff_r) { # If first value is larger than second value, get all pairs outside the range (exclusive)
-        dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) > as.numeric(diff_l) |
-                abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) < as.numeric(diff_r)]
+      # If first value is smaller than second value,
+      # get all pairs within the range (inclusive)
+      if (diff_l < diff_r) {
+        dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) >=
+                 as.numeric(diff_l) &
+                 abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) <=
+                 as.numeric(diff_r)]
+      # If first value is larger than second value,
+      # get all pairs outside the range (exclusive)
+      } else if (diff_l > diff_r) {
+        dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) >
+                 as.numeric(diff_l) |
+                 abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) <
+                 as.numeric(diff_r)]
       }
-    } else if (restriction[2] == "unequal") { # If "unequal" was set, get all pairs that differ
+    # If "unequal" was set, get all pairs that differ
+    } else if (restriction[2] == "unequal") {
       dt <- dt[get(paste0(var, ".1")) != get(paste0(var, ".2"))]
-    } else { # Otherwise, get all pairs where the difference equals the given value - 0 gives all equal pairs
-      dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) == restriction[2]]
+    # Otherwise, get all pairs where the difference equals the given value -
+    # 0 gives all equal pairs
+    } else {
+      dt <- dt[abs(get(paste0(var, ".1")) - get(paste0(var, ".2"))) ==
+               restriction[2]]
     }
   }
 
@@ -143,7 +165,8 @@ sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") 
   #------------------
 
   # Weighting schemes (Hällsten, footnote 8)
-  # w1 (all families weighted equally, strongest down-weighting of large families) = [1/2n(n - 1)]^{-1}
+  # w1 (all families weighted equally,
+  #     strongest down-weighting of large families) = [1/2n(n - 1)]^{-1}
   # w2(strong down-weighting) = [1/2(n - 1)]^{-1}
   # w3 (weak down-weighting) = [1/2[n(n - 1)]^{1/2}]^{-1}
   # w4 (equal cousin pair weight, no down-weighting of large families) = 1
@@ -151,13 +174,13 @@ sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") 
   # Calculate the selected weights
   if (weight == 1) {
     # Calculate w1 weights
-    w <- (1/2 * dt$n * (dt$n - 1))
+    w <- (1 / 2 * dt$n * (dt$n - 1))
   } else if (weight == 2) {
     # Calculate w2 weights
-    w <- (1/2 * (dt$n - 1))
+    w <- (1 / 2 * (dt$n - 1))
   } else if (weight == 3) {
     # Calculate w3 weights
-    w <- (1/2 * (dt$n * (dt$n - 1))^(1/2))
+    w <- (1 / 2 * (dt$n * (dt$n - 1)) ^ (1 / 2))
   } else if (weight == 4) {
     w <- rep(1, nrow(dt))
   } else
@@ -171,7 +194,7 @@ sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") 
   dt <- dt[, .(y.1, y.2)]
 
   # Calculate weighted covariance
-  covariance <- cov.wt(dt, wt = 1/w, method = "ML")[["cov"]]["y.1", "y.2"]
+  covariance <- cov.wt(dt, wt = 1 / w, method = "ML")[["cov"]]["y.1", "y.2"]
 
   # Calculate correlation
   rho <- covariance / variance
@@ -179,6 +202,9 @@ sc <- function(formula, data, weight = 4, restriction = NULL, variance = "pre") 
   # Get number of sibling pairs
   n_pairs <- nrow(dt)
 
-  results <- c(correlation = rho, n_individuals = n_ind, n_pairs = n_pairs, n_families = n_fams)
+  results <- c(correlation   = rho,
+               n_individuals = n_ind,
+               n_pairs       = n_pairs,
+               n_families    = n_fams)
   return(results)
 }

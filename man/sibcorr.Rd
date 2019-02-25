@@ -4,8 +4,8 @@
 \alias{sibcorr}
 \title{Estimate sibling and cousin correlations.}
 \usage{
-sibcorr(formula, data, weight = 4, restriction = NULL, variance = "pre",
-  reps = 0, ci_level = 95, cores = 1)
+sibcorr(formula, data, weight = 4, restriction = NULL,
+  variance = "pre", reps = 0, ci_level = 95, cores = 1)
 }
 \arguments{
 \item{formula}{Three-part formula describing the outcome variable, control variables to be regressed out, and identifiers for the individual, immediate family, and extended family}
